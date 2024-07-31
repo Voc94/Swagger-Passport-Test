@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('invitations', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->integer('user_id');
             $table->string('email');
             $table->boolean('status');

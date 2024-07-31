@@ -44,4 +44,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function roles(){
+        return $this->hasOne(Role::class);
+    }
+    public function messages(){
+        return $this->hasOne(Message::class);
+    }
+    public function invitations(){
+        return $this->hasMany(Invitation::class);
+    }
+    public function conversations(){
+        return $this->belongsToMany(Conversation::class,  'conversation_users', 'user_id', 'conversation_id');
+    }
+    public function friends(){
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_id');
+    }
+    public function hasRole($role_name){
+        foreach($this->roles as $role){
+            if($role->name == $role_name){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
