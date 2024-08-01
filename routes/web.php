@@ -37,3 +37,7 @@ Route::get('/user/message/conversations', function (){
         echo $user->name.'<br>';
     }
 });
+
+Route::post('/register', 'App\Http\Controllers\UserController@register');
+Route::post('/login', 'App\Http\Controllers\LoginController@login');
+Route::get('/user', 'App\Http\Controllers\UserController@getUserDetails')->middleware('auth:sanctum');
