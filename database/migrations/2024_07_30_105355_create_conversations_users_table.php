@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('conversation_users', function (Blueprint $table) {
             $table->id();
             $table->integer('conversation_id');
-            $table->integer('user_id');
+            $table->foreignUuid('user_id')->constrained();
             $table->timestamps();
         });
     }

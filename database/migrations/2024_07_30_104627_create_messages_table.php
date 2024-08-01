@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->integer('conversation_id');
-            $table->integer('from_user_id');
+            $table->foreignUuid('user_id')->constrained();
             $table->text('message');
             $table->string('attachments')->nullable();
             $table->timestamps();

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
+            $table->foreignUuid('user_id')->constrained();
             $table->string('email');
             $table->boolean('status');
             $table->timestamps();

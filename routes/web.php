@@ -10,7 +10,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/user', function (){
-    $user = User::findOrFail(1);
+    $user = User::all()->first();
     echo $user->name;
 });
 
