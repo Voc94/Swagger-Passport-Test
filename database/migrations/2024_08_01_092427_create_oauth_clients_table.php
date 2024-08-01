@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('oauth_clients', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id')->nullable()->index();
+            $table->uuid('id')->primary();
+            $table->uuid('user_id')->nullable();
             $table->string('name');
             $table->string('secret', 100)->nullable();
             $table->string('provider')->nullable();
@@ -23,6 +23,10 @@ return new class extends Migration
             $table->boolean('revoked');
             $table->timestamps();
         });
+
+        Schema::table('oauth_clients', function (Blueprint $table) {
+            $table->index('user_id', 'oauth_clients_user_id_index');
+        });
     }
 
     /**
@@ -30,6 +34,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('oauth_clients', function (Blueprint $table) {
+            $table->dropIndex('oauth_clients_user_id_index');
+        });
+
         Schema::dropIfExists('oauth_clients');
     }
 };

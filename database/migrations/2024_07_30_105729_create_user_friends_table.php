@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_friends', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id');
-            $table->integer('friend_id');
+            $table->foreignUuid('user_id');
+            $table->foreignUuid('friend_id');
+            $table->primary(['user_id','friend_id']);
             $table->timestamps();
         });
     }
