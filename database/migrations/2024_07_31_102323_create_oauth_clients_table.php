@@ -12,13 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('oauth_clients', function (Blueprint $table) {
-<<<<<<<< HEAD:database/migrations/2024_07_31_102323_create_oauth_clients_table.php
             $table->uuid('id');
             $table->uuid('user_id')->nullable()->index();
-========
-            $table->uuid('id')->primary();
-            $table->uuid('user_id')->nullable();
->>>>>>>> 50e8bc4700753af9a99de0f111a2ff8ba59afb48:database/migrations/2024_08_01_092427_create_oauth_clients_table.php
             $table->string('name');
             $table->string('secret', 100)->nullable();
             $table->string('provider')->nullable();
