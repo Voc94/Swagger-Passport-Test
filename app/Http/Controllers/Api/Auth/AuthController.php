@@ -9,7 +9,7 @@ use Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-class RegisterController extends BaseController
+class AuthController extends BaseController
 {
     /**
      * @OA\Post(
@@ -150,6 +150,60 @@ class RegisterController extends BaseController
             }
         } catch (\Exception $e) {
             Log::error('Error in login method: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+    /**
+     * @OA\Get(
+     *     path="/api/user",
+     *     summary="Get authenticated user details",
+     *     tags={"Auth"},
+     *     security={{ "bearerAuth": {} }},
+     *     @OA\Response(
+     *         response=200,
+     *         description="User details retrieved successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="object",
+     *                 @OA\Property(property="id", type="integer", example=1),
+     *                 @OA\Property(property="name", type="string", example="John Doe"),
+     *                 @OA\Property(property="email", type="string", example="john.doe@example.com"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-08-05T12:34:56Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-08-05T12:34:56Z")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal Server Error",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Internal Server Error")
+     *         )
+     *     )
+     * )
+     */
+    public function userDetails(): JsonResponse
+    {
+        Log::info('User details method called');
+
+        try {
+            if (Auth::check()) {
+                $user = Auth::user();
+                Log::info('Authenticated user details retrieved', ['user' => $user]);
+
+                return $this->sendResponse($user, 'User details retrieved successfully.');
+            } else {
+                Log::info('Unauthorized access attempt');
+                return $this->sendError('Unauthorized.', ['error' => 'Unauthorized']);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in userDetails method: ' . $e->getMessage());
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
