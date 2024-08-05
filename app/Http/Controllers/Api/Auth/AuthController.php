@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use Illuminate\Http\Request;
+use App\Models\Invitation;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Validator;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends BaseController
 {
@@ -76,6 +77,40 @@ class AuthController extends BaseController
 
             Log::info('User created', ['user' => $user]);
 
+            // Process the invitation if it exists
+            if ($request->has('invitation')) {
+                $invitationCode = $request->input('invitation');
+                $invitationEmail = base64_decode($invitationCode);
+                Log::info('Processing invitation', ['invitationCode' => $invitationCode, 'invitationEmail' => $invitationEmail]);
+
+                $invitation = Invitation::where('email', $invitationCode)->where('status', 0)->first();
+                if ($invitation) {
+                    Log::info('Invitation found and valid', ['invitation' => $invitation]);
+
+                    $invitingUser = User::find($invitation->user_id);
+                    if ($invitingUser) {
+                        if ($invitingUser->id !== $user->id) {
+                            Log::info('Inviting user found', ['invitingUser' => $invitingUser]);
+
+                            $invitingUser->friends()->attach($user->id);
+                            $user->friends()->attach($invitingUser->id);
+
+                            // Update the invitation status to 1 (used)
+                            $invitation->status = 1;
+                            $invitation->save();
+
+                            Log::info('Friends relationship created and invitation status updated', ['invitingUser' => $invitingUser->id, 'newUser' => $user->id]);
+                        } else {
+                            Log::warning('Inviting user and new user are the same', ['user' => $user->id]);
+                        }
+                    } else {
+                        Log::error('Inviting user not found', ['invitation' => $invitation]);
+                    }
+                } else {
+                    Log::error('Invitation not found or already used', ['invitationEmail' => $invitationEmail]);
+                }
+            }
+
             $success['token'] = $user->createToken('MyApp')->accessToken;
             $success['name'] = $user->name;
 
@@ -89,6 +124,7 @@ class AuthController extends BaseController
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
     /**
      * @OA\Post(
      *     path="/api/login",
@@ -135,7 +171,42 @@ class AuthController extends BaseController
         try {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 $user = Auth::user();
-                $success['token'] = $user->createToken('Mphp artisan passport:client --personalyApp')->accessToken;
+
+                // Process the invitation if it exists
+                if ($request->has('invitation')) {
+                    $invitationCode = $request->input('invitation');
+                    $invitationEmail = base64_decode($invitationCode);
+                    Log::info('Processing invitation', ['invitationCode' => $invitationCode, 'invitationEmail' => $invitationEmail]);
+
+                    $invitation = Invitation::where('email', $invitationCode)->where('status', 0)->first();
+                    if ($invitation) {
+                        Log::info('Invitation found and valid', ['invitation' => $invitation]);
+
+                        $invitingUser = User::find($invitation->user_id);
+                        if ($invitingUser) {
+                            if ($invitingUser->id !== $user->id) {
+                                Log::info('Inviting user found', ['invitingUser' => $invitingUser]);
+
+                                $invitingUser->friends()->attach($user->id);
+                                $user->friends()->attach($invitingUser->id);
+
+                                // Update the invitation status to 1 (used)
+                                $invitation->status = 1;
+                                $invitation->save();
+
+                                Log::info('Friends relationship created and invitation status updated', ['invitingUser' => $invitingUser->id, 'newUser' => $user->id]);
+                            } else {
+                                Log::warning('Inviting user and logged-in user are the same', ['user' => $user->id]);
+                            }
+                        } else {
+                            Log::error('Inviting user not found', ['invitation' => $invitation]);
+                        }
+                    } else {
+                        Log::error('Invitation not found or already used', ['invitationEmail' => $invitationEmail]);
+                    }
+                }
+
+                $success['token'] = $user->createToken('MyApp')->accessToken;
                 $success['name'] = $user->name;
 
                 Log::info('User logged in', ['user' => $user]);
@@ -153,6 +224,7 @@ class AuthController extends BaseController
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
     /**
      * @OA\Get(
      *     path="/api/user",
