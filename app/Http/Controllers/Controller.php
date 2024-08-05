@@ -1,19 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-/**
- * @OA\Info(
- *    title="Swagger with Laravel",
- *    version="1.0.0",
- * )
- * @OA\SecurityScheme(
- *     type="http",
- *     securityScheme="bearerAuth",
- *     scheme="bearer",
- *     bearerFormat="JWT"
- * )
+use OpenApi\Attributes as OA;
+#[
+    OA\Info(version: "1.0.0", description: "Chat System api", title: "Chat-System-api Documentation"),
+    OA\Server(url: 'http://127.0.0.1:8000', description: "local server"),
+    OA\Server(url: 'http://staging.example.com', description: "staging server"),
+    OA\Server(url: 'http://example.com', description: "production server"),
+    OA\SecurityScheme( securityScheme: 'bearerAuth', type: "http", name: "Authorization", in: "header", scheme: "bearer"),
+]
 
- */
 abstract class Controller
 {
     //
