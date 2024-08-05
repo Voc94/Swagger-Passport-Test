@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Mail\MailServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -13,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        MailServiceProvider::class;
     }
 
     /**

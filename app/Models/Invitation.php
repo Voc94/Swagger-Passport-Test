@@ -11,4 +11,9 @@ class Invitation extends Model
     public function users(){
         return $this->belongsTo(User::class);
     }
+    protected $fillable = [
+        'user_id',
+        'email',
+        'status',
+    ];
 }

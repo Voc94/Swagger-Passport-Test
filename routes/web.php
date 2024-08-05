@@ -1,9 +1,11 @@
 <?php
 
+use App\Mail\InvitationEmail;
 use App\Models\Conversation;
 use App\Models\Invitation;
 use App\Models\Message;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,6 +40,8 @@ Route::get('/user/message/conversations', function (){
     }
 });
 
-Route::post('/register', 'App\Http\Controllers\UserController@register');
-Route::post('/login', 'App\Http\Controllers\LoginController@login');
-Route::get('/user', 'App\Http\Controllers\UserController@getUserDetails')->middleware('auth:sanctum');
+Route::get('/testroute', function () {
+    $name = "Funny Coder";
+    $response =Mail::to('groupareea@gmail.com')->send(new \App\Mail\TestMail($name));
+    dd($response);
+});
