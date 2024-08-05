@@ -11,7 +11,10 @@ class Role extends Model
 
     protected $guarded = [];
     public function users(){
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class,'conversations_roles_users');
+    }
+    public function conversations(){
+        return $this->belongsToMany(Conversation::class,'conversations_roles_users');
     }
 
 }

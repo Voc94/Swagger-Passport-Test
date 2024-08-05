@@ -3,9 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Conversation;
+use App\Models\Role;
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +15,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         User::factory(5)->create();
+        // Ensure a user exists
+        $user = User::first();
 
-         Conversation::factory(3)->create();
-//        User::factory()->create([
-//            'name' => 'Test User',
-//            'email' => 'test@example.com',
-//        ]);
+        if (!$user) {
+            $user = User::create([
+                'name' => 'Default User',
+                'email' => 'defaultuser@example.com',
+                'password' => Hash::make('password'), // Ensure the password is hashed
+            ]);
+        }
+
+        $convo = Conversation::create(['name' => 'Conversatie']);
+        $role = Role::firstOrCreate(['name' => 'admin']);
+
+        // Manually insert into the three-way pivot table
+        \DB::table('conversations_roles_users')->insert([
+            'user_id' => $user->id,
+            'conversation_id' => $convo->id,
+            'role_id' => $role->id,
+        ]);
     }
 }

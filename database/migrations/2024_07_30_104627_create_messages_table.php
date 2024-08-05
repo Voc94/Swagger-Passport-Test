@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->integer('conversation_id');
-            $table->foreignUuid('user_id')->constrained();
+            $table->foreignId('conversation_id')->constrained();
+            $table->foreignUuid('from_user_id')->constrained('users','id');
             $table->text('message');
             $table->string('attachments')->nullable();
             $table->timestamps();
